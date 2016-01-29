@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/esm1_RelativeLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:minWidth="300dip" >
+
+    <TextView
+        android:id="@+id/esm1_instructions1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:padding="10dp"
+        android:text="Activeness"
+        android:textSize="26dp"
+        android:textAlignment="gravity"
+        android:gravity="center_vertical|center_horizontal" />
+
+    <TextView
+        android:id="@+id/esm1_min1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="12dp"
+        android:paddingBottom="2dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_below="@+id/esm1_instructions1"
+        android:layout_toLeftOf="@+id/esm1_likert1"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:text="low"
+        android:layout_above="@+id/esm1_instructions2"
+        android:textAlignment="gravity"
+        android:gravity="center_vertical|center_horizontal"
+        android:textSize="18dp" />
+
+    <RatingBar
+        android:id="@+id/esm1_likert1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/esm1_instructions1"
+        android:numStars="4"
+        android:layout_alignLeft="@+id/esm1_likert2"
+        android:layout_alignStart="@+id/esm1_likert2"
+        android:stepSize="1"/>
+
+    <TextView
+        android:id="@+id/esm1_max1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingRight="12dp"
+        android:paddingBottom="2dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_below="@+id/esm1_instructions1"
+        android:layout_toRightOf="@+id/esm1_likert1"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:text="High"
+        android:layout_above="@+id/esm1_instructions2"
+        android:textAlignment="gravity"
+        android:gravity="center_vertical|center_horizontal"
+        android:textSize="18dp" />
+
+    <TextView
+        android:id="@+id/esm1_instructions2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:padding="10dp"
+        android:text="Pleasure"
+        android:layout_below="@+id/esm1_likert1"
+        android:textSize="26dp"
+        android:textAlignment="gravity"
+        android:gravity="center_vertical|center_horizontal" />
+
+    <TextView
+        android:id="@+id/esm1_min2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="12dp"
+        android:paddingBottom="2dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_below="@+id/esm1_instructions2"
+        android:layout_toLeftOf="@+id/esm1_likert2"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:text="low"
+        android:textAlignment="gravity"
+        android:gravity="center_vertical|center_horizontal"
+        android:textSize="18dp" />
+
+    <RatingBar
+        android:id="@+id/esm1_likert2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/esm1_instructions2"
+        android:numStars="4"
+        android:layout_centerHorizontal="true"
+        android:stepSize="1"
+        />
+
+    <TextView
+        android:id="@+id/esm1_max2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingRight="12dp"
+        android:paddingBottom="2dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_below="@+id/esm1_instructions2"
+        android:layout_toRightOf="@+id/esm1_likert2"
+        android:layout_alignRight="@+id/esm1_max1"
+        android:layout_alignEnd="@+id/esm1_max1"
+        android:text="high"
+        android:textAlignment="gravity"
+        android:gravity="center_vertical|center_horizontal"
+        android:textSize="18dp" />
+
+</RelativeLayout>
