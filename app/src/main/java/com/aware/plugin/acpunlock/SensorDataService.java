@@ -116,10 +116,8 @@ public class SensorDataService extends Service implements SensorEventListener {
         registerReceiver(wifiListener, wifi_filter);
         registerReceiver(networkListener, network_filter);
         registerReceiver(locationListener, location_filter);
-
     }
-
-
+    
     //variables of sensor data
 
     private static String screen_state;
@@ -170,10 +168,13 @@ public class SensorDataService extends Service implements SensorEventListener {
         data.put(Unlock_Monitor_Data3.LIGHT, light);
         data.put(Unlock_Monitor_Data3.PROXIMITY, proximity);
         data.put(Unlock_Monitor_Data3.WIFI, wifi);
-        data.put(Unlock_Monitor_Data3.WIFI, network_type);
-        data.put(Unlock_Monitor_Data3.WIFI, network_type);
-
-
+        data.put(Unlock_Monitor_Data3.NETWORK_TYPE, network_type);
+        data.put(Unlock_Monitor_Data3.RECEIVED_BYTES, received_bytes);
+        data.put(Unlock_Monitor_Data3.SENT_BYTES, sent_bytes);
+        data.put(Unlock_Monitor_Data3.LATITUDE, latitude);
+        data.put(Unlock_Monitor_Data3.LONGITUDE, longitude);
+        data.put(Unlock_Monitor_Data3.LOCATIONSOURCE, locationSource);
+        data.put(Unlock_Monitor_Data3.STEP,step);
 
         //send to AWARE
         Intent context_unlock = new Intent();
@@ -430,7 +431,6 @@ public class SensorDataService extends Service implements SensorEventListener {
         // TODO Auto-generated method stub
     }
 
-
     //step sensor
     //if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
         //return Math.round(event.values[0]);
@@ -444,8 +444,6 @@ public class SensorDataService extends Service implements SensorEventListener {
         }
 
     }
-
-
 
     @Override
     public IBinder onBind(Intent intent) {
