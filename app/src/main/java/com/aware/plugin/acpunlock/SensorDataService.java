@@ -39,14 +39,14 @@ public class SensorDataService extends Service {
 
         Log.d("UNLOCK", "40");
         Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LIGHT, true);
-        Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_LIGHT, 2000000000);
+        Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_LIGHT, 200000);
         Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_APPLICATIONS, true);
         Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_COMMUNICATION_EVENTS, true);
         Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SCREEN, true);
         Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_WIFI, true);
         Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WIFI, 60);
         Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_PROXIMITY, true);
-        Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_PROXIMITY, 2000000000);
+        Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_PROXIMITY, 200000);
 
         //application data
         IntentFilter application_filter = new IntentFilter();
