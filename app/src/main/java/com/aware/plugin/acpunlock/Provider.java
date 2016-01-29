@@ -22,7 +22,7 @@ import com.aware.utils.DatabaseHelper;
  * Created by Comet on 21/01/16.
  */
 public class Provider extends ContentProvider {
-    public static final int DATABASE_VERSION = 9;
+    public static final int DATABASE_VERSION = 10;
     /**
      * Provider authority: com.aware.plugin.acpunlock.provider.acpunlock
      */
