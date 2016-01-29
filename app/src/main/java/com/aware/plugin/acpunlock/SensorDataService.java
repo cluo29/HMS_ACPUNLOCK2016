@@ -117,7 +117,7 @@ public class SensorDataService extends Service implements SensorEventListener {
         registerReceiver(networkListener, network_filter);
         registerReceiver(locationListener, location_filter);
     }
-    
+
     //variables of sensor data
 
     private static String screen_state;

@@ -22,9 +22,9 @@ import com.aware.utils.DatabaseHelper;
  * Created by Comet on 21/01/16.
  */
 public class Provider extends ContentProvider {
-    public static final int DATABASE_VERSION = 8;
+    public static final int DATABASE_VERSION = 9;
     /**
-     * Provider authority: com.aware.plugin.ACPUnlock.provider.ACPUnlock
+     * Provider authority: com.aware.plugin.acpunlock.provider.acpunlock
      */
     public static String AUTHORITY = "com.aware.plugin.acpunlock.provider.acpunlock";
     //store activity data
@@ -90,8 +90,13 @@ public class Provider extends ContentProvider {
         public static final String LIGHT = "double_light";
         public static final String PROXIMITY = "double_proximity";
         public static final String WIFI = "wifi"; //should be nearby ones
+        public static final String NETWORK_TYPE = "network_type"; //
         public static final String RECEIVED_BYTES = "double_received_bytes";
         public static final String SENT_BYTES = "double_sent_bytes";
+        public static final String LATITUDE = "double_latitude";
+        public static final String LONGITUDE = "double_longitude";
+        public static final String LOCATIONSOURCE = "location_source";
+        public static final String STEP = "step";
         //let's get these first
     }
 
@@ -123,8 +128,13 @@ public class Provider extends ContentProvider {
         Unlock_Monitor_Data3.LIGHT + " real default -1," +
         Unlock_Monitor_Data3.PROXIMITY + " real default -1," +
         Unlock_Monitor_Data3.WIFI + " text default ''," +
+        Unlock_Monitor_Data3.NETWORK_TYPE + " integer default 0," +
         Unlock_Monitor_Data3.RECEIVED_BYTES + " real default 0," +
         Unlock_Monitor_Data3.SENT_BYTES + " real default 0," +
+        Unlock_Monitor_Data3.LATITUDE + " real default 0," +
+        Unlock_Monitor_Data3.LONGITUDE + " real default 0," +
+        Unlock_Monitor_Data3.LOCATIONSOURCE + " text default ''," +
+        Unlock_Monitor_Data3.STEP + " integer default 0," +
         "UNIQUE("+ Unlock_Monitor_Data3.TIMESTAMP+","+ Unlock_Monitor_Data3.DEVICE_ID+")"
     };
 
@@ -182,8 +192,13 @@ public class Provider extends ContentProvider {
         databaseMap3.put(Unlock_Monitor_Data3.LIGHT, Unlock_Monitor_Data3.LIGHT);
         databaseMap3.put(Unlock_Monitor_Data3.PROXIMITY, Unlock_Monitor_Data3.PROXIMITY);
         databaseMap3.put(Unlock_Monitor_Data3.WIFI, Unlock_Monitor_Data3.WIFI);
+        databaseMap3.put(Unlock_Monitor_Data3.NETWORK_TYPE,Unlock_Monitor_Data3.NETWORK_TYPE);
         databaseMap3.put(Unlock_Monitor_Data3.RECEIVED_BYTES, Unlock_Monitor_Data3.RECEIVED_BYTES);
         databaseMap3.put(Unlock_Monitor_Data3.SENT_BYTES, Unlock_Monitor_Data3.SENT_BYTES);
+        databaseMap3.put(Unlock_Monitor_Data3.LATITUDE, Unlock_Monitor_Data3.LATITUDE);
+        databaseMap3.put(Unlock_Monitor_Data3.LONGITUDE, Unlock_Monitor_Data3.LONGITUDE);
+        databaseMap3.put(Unlock_Monitor_Data3.LOCATIONSOURCE, Unlock_Monitor_Data3.LOCATIONSOURCE);
+        databaseMap3.put(Unlock_Monitor_Data3.STEP, Unlock_Monitor_Data3.STEP);
         return true;
     }
 
