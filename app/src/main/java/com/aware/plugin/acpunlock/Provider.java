@@ -22,7 +22,7 @@ import com.aware.utils.DatabaseHelper;
  * Created by Comet on 21/01/16.
  */
 public class Provider extends ContentProvider {
-    public static final int DATABASE_VERSION = 7;
+    public static final int DATABASE_VERSION = 8;
     /**
      * Provider authority: com.aware.plugin.ACPUnlock.provider.ACPUnlock
      */
@@ -90,6 +90,8 @@ public class Provider extends ContentProvider {
         public static final String LIGHT = "double_light";
         public static final String PROXIMITY = "double_proximity";
         public static final String WIFI = "wifi"; //should be nearby ones
+        public static final String RECEIVED_BYTES = "double_received_bytes";
+        public static final String SENT_BYTES = "double_sent_bytes";
         //let's get these first
     }
 
@@ -118,9 +120,11 @@ public class Provider extends ContentProvider {
         Unlock_Monitor_Data3.SCREEN + " text default ''," +
         Unlock_Monitor_Data3.CALL_RINGING + " text default ''," +
         Unlock_Monitor_Data3.MESSAGE_RECEIVED + " text default ''," +
-        Unlock_Monitor_Data3.LIGHT + " real default 0," +
-        Unlock_Monitor_Data3.PROXIMITY + " real default 0," +
+        Unlock_Monitor_Data3.LIGHT + " real default -1," +
+        Unlock_Monitor_Data3.PROXIMITY + " real default -1," +
         Unlock_Monitor_Data3.WIFI + " text default ''," +
+        Unlock_Monitor_Data3.RECEIVED_BYTES + " real default 0," +
+        Unlock_Monitor_Data3.SENT_BYTES + " real default 0," +
         "UNIQUE("+ Unlock_Monitor_Data3.TIMESTAMP+","+ Unlock_Monitor_Data3.DEVICE_ID+")"
     };
 
@@ -178,6 +182,8 @@ public class Provider extends ContentProvider {
         databaseMap3.put(Unlock_Monitor_Data3.LIGHT, Unlock_Monitor_Data3.LIGHT);
         databaseMap3.put(Unlock_Monitor_Data3.PROXIMITY, Unlock_Monitor_Data3.PROXIMITY);
         databaseMap3.put(Unlock_Monitor_Data3.WIFI, Unlock_Monitor_Data3.WIFI);
+        databaseMap3.put(Unlock_Monitor_Data3.RECEIVED_BYTES, Unlock_Monitor_Data3.RECEIVED_BYTES);
+        databaseMap3.put(Unlock_Monitor_Data3.SENT_BYTES, Unlock_Monitor_Data3.SENT_BYTES);
         return true;
     }
 

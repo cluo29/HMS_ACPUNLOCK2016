@@ -42,7 +42,7 @@
         android:numStars="4"
         android:layout_alignLeft="@+id/esm1_likert2"
         android:layout_alignStart="@+id/esm1_likert2"
-        android:stepSize="1"/>
+        />
 
     <TextView
         android:id="@+id/esm1_max1"
@@ -96,7 +96,7 @@
         android:layout_below="@+id/esm1_instructions2"
         android:numStars="4"
         android:layout_centerHorizontal="true"
-        android:stepSize="1"
+
         />
 
     <TextView

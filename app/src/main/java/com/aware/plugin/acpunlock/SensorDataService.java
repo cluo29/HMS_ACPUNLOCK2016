@@ -7,6 +7,10 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -15,27 +19,41 @@ import com.aware.Aware;
 import com.aware.Aware_Preferences;
 import com.aware.Communication;
 import com.aware.Light;
+import com.aware.Locations;
+import com.aware.Network;
 import com.aware.Proximity;
 import com.aware.Screen;
+import com.aware.Traffic;
 import com.aware.WiFi;
 import com.aware.providers.Applications_Provider;
 import com.aware.providers.Light_Provider;
 import com.aware.plugin.acpunlock.Provider.Unlock_Monitor_Data3;
 import com.aware.providers.Proximity_Provider;
 import com.aware.providers.WiFi_Provider;
+import com.aware.providers.Traffic_Provider;
+import com.aware.providers.Traffic_Provider.Traffic_Data;
+import com.aware.providers.Locations_Provider.Locations_Data;
 
 /**
- * Created by Comet on 28/01/16. v22 44
+ * Created by Comet on 28/01/16. v01291447
  */
-public class SensorDataService extends Service {
+public class SensorDataService extends Service implements SensorEventListener {
 
     public static final String ACTION_AWARE_PLUGIN_ACP_UNLOCK_SENSOR = "ACTION_AWARE_PLUGIN_ACP_UNLOCK_SENSOR";
 
     public static final String EXTRA_DATA = "data";
 
+    private SensorManager mSensorManager;
+    private Sensor mSensor;
 
     @Override
     public void onCreate() {
+
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+
+        mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
 
         Log.d("UNLOCK", "40");
         Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LIGHT, true);
@@ -47,6 +65,12 @@ public class SensorDataService extends Service {
         Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WIFI, 60);
         Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_PROXIMITY, true);
         Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_PROXIMITY, 200000);
+        Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_NETWORK_TRAFFIC, true);
+        Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_NETWORK_TRAFFIC, 60);
+        Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LOCATION_GPS, true);
+        Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LOCATION_NETWORK, true);
+        Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_LOCATION_GPS, 180);
+        Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_LOCATION_NETWORK, 300);
 
         //application data
         IntentFilter application_filter = new IntentFilter();
@@ -76,12 +100,22 @@ public class SensorDataService extends Service {
         IntentFilter wifi_filter = new IntentFilter();
         wifi_filter.addAction(WiFi.ACTION_AWARE_WIFI_NEW_DEVICE);
 
+        //network data
+        IntentFilter network_filter = new IntentFilter();
+        wifi_filter.addAction(Traffic.ACTION_AWARE_NETWORK_TRAFFIC);
+
+        //Location data
+        IntentFilter location_filter = new IntentFilter();
+        wifi_filter.addAction(Locations.ACTION_AWARE_LOCATIONS);
+
         registerReceiver(screenListener, screen_filter);
         registerReceiver(applicationListener, application_filter);
         registerReceiver(communicationListener, communication_filter);
         registerReceiver(lightListener, light_filter);
         registerReceiver(proximityListener, proximity_filter);
         registerReceiver(wifiListener, wifi_filter);
+        registerReceiver(networkListener, network_filter);
+        registerReceiver(locationListener, location_filter);
 
     }
 
@@ -96,6 +130,14 @@ public class SensorDataService extends Service {
     private static double light;
     private static double proximity;
     private static String wifi;
+    private static int network_type;
+    private static long received_bytes;
+    private static long sent_bytes;
+    private static double latitude;
+    private static double longitude;
+    private static String locationSource;
+
+    private static int step = 0;
 
     public static void variableReset() {
         screen_state = "";
@@ -103,9 +145,15 @@ public class SensorDataService extends Service {
         foreground_package = "";
         call_ringing = "";
         message_received = "";
-        light = 0;
-        proximity = 0;
+        light = -1;
+        proximity = -1;
         wifi = "";
+        network_type = 0; //1 = mobile 2 = wifi
+        received_bytes = 0;
+        sent_bytes = 0;
+        latitude = -1;
+        longitude = -1;
+        locationSource = "";
     }
 
     //context broadcast
@@ -122,6 +170,10 @@ public class SensorDataService extends Service {
         data.put(Unlock_Monitor_Data3.LIGHT, light);
         data.put(Unlock_Monitor_Data3.PROXIMITY, proximity);
         data.put(Unlock_Monitor_Data3.WIFI, wifi);
+        data.put(Unlock_Monitor_Data3.WIFI, network_type);
+        data.put(Unlock_Monitor_Data3.WIFI, network_type);
+
+
 
         //send to AWARE
         Intent context_unlock = new Intent();
@@ -233,14 +285,15 @@ public class SensorDataService extends Service {
             //reset variables
             variableReset();
             if (intent.getAction().equals(Light.ACTION_AWARE_LIGHT)){
-                Cursor cursor = context.getContentResolver().query(Light_Provider.Light_Data.CONTENT_URI, null, null, null, Light_Provider.Light_Data.TIMESTAMP + " DESC LIMIT 1");
-                if (cursor != null && cursor.moveToFirst()) {
-                    light = cursor.getDouble(cursor.getColumnIndex(Light_Provider.Light_Data.LIGHT_LUX));
+
+                ContentValues light_data = intent.getParcelableExtra(Light.EXTRA_DATA);
+                if (light_data != null) {
+                    Log.d("UNLOCK", "Light sensor AVAILABLE");
+                    light = light_data.getAsDouble("double_light_lux");
                     Log.d("UNLOCK","light="+ light);
-                }
-                if (cursor != null && !cursor.isClosed())
-                {
-                    cursor.close();
+                } else {
+                    Log.d("UNLOCK", "Light sensor UNAVAILABLE");
+                    light = 0;
                 }
             }
 
@@ -261,14 +314,14 @@ public class SensorDataService extends Service {
             //reset variables
             variableReset();
             if (intent.getAction().equals(Proximity.ACTION_AWARE_PROXIMITY)){
-                Cursor cursor = context.getContentResolver().query(Proximity_Provider.Proximity_Data.CONTENT_URI, null, null, null, Proximity_Provider.Proximity_Data.TIMESTAMP + " DESC LIMIT 1");
-                if (cursor != null && cursor.moveToFirst()) {
-                    proximity = cursor.getDouble(cursor.getColumnIndex(Proximity_Provider.Proximity_Data.PROXIMITY));
-                    Log.d("UNLOCK","proximity="+ proximity);
-                }
-                if (cursor != null && !cursor.isClosed())
-                {
-                    cursor.close();
+                Log.d("UNLOCK", "Received proximity data");
+                ContentValues proximity_data = intent.getParcelableExtra(Proximity.EXTRA_DATA);
+                if (proximity_data != null) {
+                    proximity = proximity_data.getAsDouble("double_proximity");
+                    Log.d("UNLOCK", "proximity = "+proximity);
+                } else {
+                    proximity = -1;
+                    Log.d("UNLOCK", "Proximity sensor UNAVAILABLE");
                 }
             }
 
@@ -306,6 +359,92 @@ public class SensorDataService extends Service {
         }
     }
 
+    //networkListener
+    /**
+     * BroadcastReceiver that will receive network events from AWARE
+     */
+    private static NetworkListener networkListener = new NetworkListener();
+
+    public static class NetworkListener extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //reset variables
+            variableReset();
+            if (intent.getAction().equals(Traffic.ACTION_AWARE_NETWORK_TRAFFIC)){
+                Log.d("UNLOCK","ACTION_AWARE_NETWORK_TRAFFIC");
+                //get data!!!
+                Cursor cursor = context.getContentResolver().query(Traffic_Data.CONTENT_URI, null, null, null, Traffic_Data.TIMESTAMP + " DESC LIMIT 1");
+                if (cursor != null && cursor.moveToFirst()) {
+                    network_type = cursor.getInt(cursor.getColumnIndex(Traffic_Data.NETWORK_TYPE));
+                    received_bytes = cursor.getLong(cursor.getColumnIndex(Traffic_Data.RECEIVED_BYTES));
+                    sent_bytes = cursor.getLong(cursor.getColumnIndex(Traffic_Data.SENT_BYTES));
+                    Log.d("UNLOCK","received_bytes="+ received_bytes);
+                    Log.d("UNLOCK","sent_bytes="+ sent_bytes);
+                }
+                if (cursor != null && !cursor.isClosed())
+                {
+                    cursor.close();
+                }
+            }
+
+            //sync data!
+            BroadContext(context);
+        }
+    }
+
+    //locationListener
+    /**
+     * BroadcastReceiver that will receive location events from AWARE
+     */
+    private static LocationListener locationListener = new LocationListener();
+
+    public static class LocationListener extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //reset variables
+            variableReset();
+            if (intent.getAction().equals(Locations.ACTION_AWARE_LOCATIONS)){
+                Log.d("UNLOCK","Locations");
+                //get data!!!
+                Cursor cursor = context.getContentResolver().query(Locations_Data.CONTENT_URI, null, null, null, Locations_Data.TIMESTAMP + " DESC LIMIT 1");
+                if (cursor != null && cursor.moveToFirst()) {
+                    latitude = cursor.getDouble(cursor.getColumnIndex(Locations_Data.LATITUDE));
+                    longitude = cursor.getDouble(cursor.getColumnIndex(Locations_Data.LONGITUDE));
+                    locationSource = cursor.getString(cursor.getColumnIndex(Locations_Data.PROVIDER));
+                    Log.d("UNLOCK","latitude="+ latitude);
+                    Log.d("UNLOCK","longitude="+ longitude);
+                    Log.d("UNLOCK","locationSource="+ locationSource);
+                }
+                if (cursor != null && !cursor.isClosed())
+                {
+                    cursor.close();
+                }
+            }
+
+            //sync data!
+            BroadContext(context);
+        }
+    }
+
+    public void onAccuracyChanged(Sensor arg0, int arg1) {
+        // TODO Auto-generated method stub
+    }
+
+
+    //step sensor
+    //if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
+        //return Math.round(event.values[0]);
+    //}
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        Sensor sensor = event.sensor;
+        if (sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
+            step = Math.round(event.values[0]);
+            Log.d("UNLOCK","step = "+ step);
+        }
+
+    }
+
 
 
     @Override
@@ -322,6 +461,9 @@ public class SensorDataService extends Service {
         Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SCREEN, false);
         Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_WIFI, false);
         Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_PROXIMITY, false);
+        Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_NETWORK_TRAFFIC, false);
+        Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LOCATION_GPS, false);
+        Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LOCATION_NETWORK, false);
         if(screenListener != null) {
             unregisterReceiver(screenListener);
         }
@@ -339,6 +481,12 @@ public class SensorDataService extends Service {
         }
         if(wifiListener != null) {
             unregisterReceiver(wifiListener);
+        }
+        if(networkListener != null) {
+            unregisterReceiver(networkListener);
+        }
+        if(locationListener != null) {
+            unregisterReceiver(locationListener);
         }
     }
 
