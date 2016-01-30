@@ -137,6 +137,8 @@ public class SensorDataService extends Service implements SensorEventListener {
 
     private static int step = 0;
 
+    private static int light_counter=0;
+
     public static void variableReset() {
         screen_state = "";
         application_notification = "";
@@ -283,6 +285,13 @@ public class SensorDataService extends Service implements SensorEventListener {
     public static class LightListener extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
+            //record light per 25 samples, each sample = 200ms
+            light_counter++;
+            if(light_counter<25)
+            {
+                return;
+            }
+
             //reset variables
             variableReset();
             if (intent.getAction().equals(Light.ACTION_AWARE_LIGHT)){
@@ -300,6 +309,7 @@ public class SensorDataService extends Service implements SensorEventListener {
 
             //sync data!
             BroadContext(context);
+            light_counter=0;
         }
     }
 
