@@ -18,19 +18,14 @@ import com.aware.Applications;
 import com.aware.Aware;
 import com.aware.Aware_Preferences;
 import com.aware.Communication;
-import com.aware.Light;
 import com.aware.Locations;
-import com.aware.Network;
 import com.aware.Proximity;
 import com.aware.Screen;
 import com.aware.Traffic;
 import com.aware.WiFi;
 import com.aware.providers.Applications_Provider;
-import com.aware.providers.Light_Provider;
 import com.aware.plugin.acpunlock.Provider.Unlock_Monitor_Data3;
-import com.aware.providers.Proximity_Provider;
 import com.aware.providers.WiFi_Provider;
-import com.aware.providers.Traffic_Provider;
 import com.aware.providers.Traffic_Provider.Traffic_Data;
 import com.aware.providers.Locations_Provider.Locations_Data;
 
@@ -44,20 +39,24 @@ public class SensorDataService extends Service implements SensorEventListener {
     public static final String EXTRA_DATA = "data";
 
     private SensorManager mSensorManager;
-    private Sensor mSensor;
-
+    private Sensor mSensor_Step_Counter;
+    private Sensor mSensor_Light;
     @Override
     public void onCreate() {
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
-        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+        mSensor_Step_Counter = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
 
-        mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensor_Light = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+
+        mSensorManager.registerListener(this, mSensor_Light, SensorManager.SENSOR_DELAY_NORMAL);
+
+        mSensorManager.registerListener(this, mSensor_Step_Counter, SensorManager.SENSOR_DELAY_NORMAL);
 
         Log.d("UNLOCK", "40");
-        Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LIGHT, true);
-        Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_LIGHT, 200000);
+        //Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LIGHT, true);
+        //Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_LIGHT, 200000);
         Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_APPLICATIONS, true);
         Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_COMMUNICATION_EVENTS, true);
         Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SCREEN, true);
@@ -88,10 +87,6 @@ public class SensorDataService extends Service implements SensorEventListener {
         communication_filter.addAction(Communication.ACTION_AWARE_CALL_RINGING);
         communication_filter.addAction(Communication.ACTION_AWARE_MESSAGE_RECEIVED);
 
-        //light data
-        IntentFilter light_filter = new IntentFilter();
-        light_filter.addAction(Light.ACTION_AWARE_LIGHT);
-
         //proximity data
         IntentFilter proximity_filter = new IntentFilter();
         proximity_filter.addAction(Proximity.ACTION_AWARE_PROXIMITY);
@@ -111,7 +106,6 @@ public class SensorDataService extends Service implements SensorEventListener {
         registerReceiver(screenListener, screen_filter);
         registerReceiver(applicationListener, application_filter);
         registerReceiver(communicationListener, communication_filter);
-        registerReceiver(lightListener, light_filter);
         registerReceiver(proximityListener, proximity_filter);
         registerReceiver(wifiListener, wifi_filter);
         registerReceiver(networkListener, network_filter);
@@ -275,11 +269,12 @@ public class SensorDataService extends Service implements SensorEventListener {
         }
     }
 
+
     //lightListener
     /**
      * BroadcastReceiver that will receive light events from AWARE
      */
-
+/*
     private static LightListener lightListener = new LightListener();
 
     public static class LightListener extends BroadcastReceiver {
@@ -312,7 +307,7 @@ public class SensorDataService extends Service implements SensorEventListener {
             light_counter=0;
         }
     }
-
+*/
     /**
      * BroadcastReceiver that will receive proximity events from AWARE
      */
@@ -452,6 +447,20 @@ public class SensorDataService extends Service implements SensorEventListener {
             step = Math.round(event.values[0]);
             Log.d("UNLOCK","step = "+ step);
         }
+        if (sensor.getType() == Sensor.TYPE_LIGHT)
+        {
+            variableReset();
+            light_counter++;
+            if(light_counter<25)
+            {
+                return;
+            }
+            light = event.values[0];
+            Log.d("UNLOCK","light = "+ light);
+            light_counter = 0;
+            BroadContext(getApplicationContext());
+
+        }
 
     }
 
@@ -463,7 +472,7 @@ public class SensorDataService extends Service implements SensorEventListener {
 
     @Override
     public void onDestroy() {
-        Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LIGHT, false);
+        //Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LIGHT, false);
         Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_APPLICATIONS, false);
         Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_COMMUNICATION_EVENTS, false);
         Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SCREEN, false);
@@ -480,9 +489,6 @@ public class SensorDataService extends Service implements SensorEventListener {
         }
         if(communicationListener != null) {
             unregisterReceiver(communicationListener);
-        }
-        if(lightListener != null) {
-            unregisterReceiver(lightListener);
         }
         if(proximityListener != null) {
             unregisterReceiver(proximityListener);
