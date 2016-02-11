@@ -6,6 +6,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +20,8 @@ import com.aware.Aware;
 import com.aware.Aware_Preferences;
 import com.aware.utils.Aware_Plugin;
 import com.aware.plugin.acpunlock.Provider.Unlock_Monitor_Data2;
+
+import java.util.jar.Manifest;
 
 public class Plugin extends Aware_Plugin {
 
@@ -119,15 +123,16 @@ public class Plugin extends Aware_Plugin {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(Intent.ACTION_USER_PRESENT)) {
-                //Log.d("UNLOCK", "SCREEN UNLOCKED");
-                alert.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
-                alert.show();
-                alert.getWindow().getAttributes();
-                View v = (View)alert.getWindow().findViewById(android.R.id.message).getParent();
-                v.setMinimumHeight(0);
-                TextView textView = (TextView) alert.findViewById(android.R.id.message);
-                textView.setTextSize(13);
-                textView.setMinimumHeight(0);
+
+                    //Log.d("UNLOCK", "SCREEN UNLOCKED");
+                    alert.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+                    alert.show();
+                    alert.getWindow().getAttributes();
+                    View v = (View) alert.getWindow().findViewById(android.R.id.message).getParent();
+                    v.setMinimumHeight(0);
+                    TextView textView = (TextView) alert.findViewById(android.R.id.message);
+                    textView.setTextSize(13);
+                    textView.setMinimumHeight(0);
 
             }
         }
@@ -135,54 +140,55 @@ public class Plugin extends Aware_Plugin {
 
     //ESM when boot or installation
     private void startBootESM() {
-        LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("What is your mood now?");
-        builder.setMessage("Please choose below.");
 
-        final View layout = inflater.inflate(R.layout.question, null);
-        builder.setView(layout);
+            LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("What is your mood now?");
+            builder.setMessage("Please choose below.");
 
-        alert = builder.create();
+            final View layout = inflater.inflate(R.layout.question, null);
+            builder.setView(layout);
 
-        final RatingBar sBar1 = (RatingBar) layout.findViewById(R.id.esm1_likert1);
-        final RatingBar sBar2 = (RatingBar) layout.findViewById(R.id.esm1_likert2) ;
+            alert = builder.create();
 
-        RatingBar.OnRatingBarChangeListener barChangeListener = new RatingBar.OnRatingBarChangeListener() {
-            @Override
-            public void onRatingChanged(RatingBar rBar, float fRating, boolean fromUser) {
-                float rating1_unstable = sBar1.getRating();
-                float rating2_unstable = sBar2.getRating();
-                if(rating1_unstable>0.1&&rating2_unstable>0.1 )
-                {
-                    rating1 = rating1_unstable;
-                    rating2 = rating2_unstable;
-                    Log.d("UNLOCK", "answer submit");
-                    Log.d("UNLOCK", "answer 1="+rating1);
-                    Log.d("UNLOCK", "answer 2="+rating2);
+            final RatingBar sBar1 = (RatingBar) layout.findViewById(R.id.esm1_likert1);
+            final RatingBar sBar2 = (RatingBar) layout.findViewById(R.id.esm1_likert2);
 
-                    sendBroadcast(new Intent("ESM_answer_submitted"));
-                    sBar1.setRating(0);
-                    sBar2.setRating(0);
-                    alert.dismiss();
+            RatingBar.OnRatingBarChangeListener barChangeListener = new RatingBar.OnRatingBarChangeListener() {
+                @Override
+                public void onRatingChanged(RatingBar rBar, float fRating, boolean fromUser) {
+                    float rating1_unstable = sBar1.getRating();
+                    float rating2_unstable = sBar2.getRating();
+                    if (rating1_unstable > 0.1 && rating2_unstable > 0.1) {
+                        rating1 = rating1_unstable;
+                        rating2 = rating2_unstable;
+                        Log.d("UNLOCK", "answer submit");
+                        Log.d("UNLOCK", "answer 1=" + rating1);
+                        Log.d("UNLOCK", "answer 2=" + rating2);
+
+                        sendBroadcast(new Intent("ESM_answer_submitted"));
+                        sBar1.setRating(0);
+                        sBar2.setRating(0);
+                        alert.dismiss();
+                    }
+
                 }
+            };
 
-            }
-        };
+            sBar1.setOnRatingBarChangeListener(barChangeListener);
+            sBar2.setOnRatingBarChangeListener(barChangeListener);
 
-        sBar1.setOnRatingBarChangeListener(barChangeListener);
-        sBar2.setOnRatingBarChangeListener(barChangeListener);
+            alert.setCanceledOnTouchOutside(false);
 
-        alert.setCanceledOnTouchOutside(false);
+            alert.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+            alert.show();
+            alert.getWindow().getAttributes();
+            View v = (View) alert.getWindow().findViewById(android.R.id.message).getParent();
+            v.setMinimumHeight(0);
+            TextView textView = (TextView) alert.findViewById(android.R.id.message);
+            textView.setTextSize(13);
+            textView.setMinimumHeight(0);
 
-        alert.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
-        alert.show();
-        alert.getWindow().getAttributes();
-        View v = (View)alert.getWindow().findViewById(android.R.id.message).getParent();
-        v.setMinimumHeight(0);
-        TextView textView = (TextView) alert.findViewById(android.R.id.message);
-        textView.setTextSize(13);
-        textView.setMinimumHeight(0);
     }
 
     //ESM answer listener
