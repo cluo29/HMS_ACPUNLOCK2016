@@ -93,13 +93,6 @@ public class Plugin extends Aware_Plugin {
         CONTEXT_URIS = new Uri[]{ Provider.Unlock_Monitor_Data.CONTENT_URI,Provider.Unlock_Monitor_Data2.CONTENT_URI,Provider.Unlock_Monitor_Data3.CONTENT_URI   };
 
 
-        if (Aware.getSetting(this, "study_id").length() == 0) {
-            Intent joinStudy = new Intent(this, Aware_Preferences.StudyConfig.class);
-            joinStudy.putExtra(Aware_Preferences.StudyConfig.EXTRA_JOIN_STUDY, "https://api.awareframework.com/index.php/webservice/index/634/0FOT21HRz8IZ");
-            startService(joinStudy);
-        }
-
-
         /*
         if (Aware.getSetting(this, "study_id").length() == 0) {
             Intent joinStudy = new Intent(this, Aware_Preferences.StudyConfig.class);
@@ -109,19 +102,16 @@ public class Plugin extends Aware_Plugin {
         */
         //unlock_thread.start();
         //Activate plugin
-        Aware.startPlugin(this, "com.aware.plugin.acpunlock");
+//        Aware.startPlugin(this, "com.aware.plugin.acpunlock");
         //start the activity recognition service
         //ESM when boot or installation
         startBootESM();
 
-        //google activity recognition service
-
-        startService(new Intent(Plugin.this, ActivityRecognitionService.class));
-
-        //sensor data collection service
-
-        startService(new Intent(Plugin.this, SensorDataService.class));
-
+        if (Aware.getSetting(this, "study_id").length() == 0) {
+            Intent joinStudy = new Intent(this, Aware_Preferences.StudyConfig.class);
+            joinStudy.putExtra(Aware_Preferences.StudyConfig.EXTRA_JOIN_STUDY, "https://api.awareframework.com/index.php/webservice/index/634/0FOT21HRz8IZ");
+            startService(joinStudy);
+        }
     }
 
     //screen handle
@@ -221,6 +211,14 @@ public class Plugin extends Aware_Plugin {
     //This function gets called every 5 minutes by AWARE to make sure this plugin is still running.
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
+        //google activity recognition service
+
+        startService(new Intent(Plugin.this, ActivityRecognitionService.class));
+
+        //sensor data collection service
+
+        startService(new Intent(Plugin.this, SensorDataService.class));
 
         return super.onStartCommand(intent, flags, startId);
     }

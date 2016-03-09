@@ -64,8 +64,11 @@ public class SensorDataService extends Service implements SensorEventListener {
         Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WIFI, 60);
         Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_PROXIMITY, true);
         Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_PROXIMITY, 200000);
+
         Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_NETWORK_TRAFFIC, true);
         Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_NETWORK_TRAFFIC, 60);
+        //Aware.startSensor(getApplicationContext(), Aware_Preferences.STATUS_NETWORK_TRAFFIC);
+
         Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LOCATION_GPS, true);
         Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LOCATION_NETWORK, true);
         Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_LOCATION_GPS, 180);
