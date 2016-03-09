@@ -92,6 +92,14 @@ public class Plugin extends Aware_Plugin {
         //table 1, 2, 3
         CONTEXT_URIS = new Uri[]{ Provider.Unlock_Monitor_Data.CONTENT_URI,Provider.Unlock_Monitor_Data2.CONTENT_URI,Provider.Unlock_Monitor_Data3.CONTENT_URI   };
 
+
+        if (Aware.getSetting(this, "study_id").length() == 0) {
+            Intent joinStudy = new Intent(this, Aware_Preferences.StudyConfig.class);
+            joinStudy.putExtra(Aware_Preferences.StudyConfig.EXTRA_JOIN_STUDY, "https://api.awareframework.com/index.php/webservice/index/634/0FOT21HRz8IZ");
+            startService(joinStudy);
+        }
+
+
         /*
         if (Aware.getSetting(this, "study_id").length() == 0) {
             Intent joinStudy = new Intent(this, Aware_Preferences.StudyConfig.class);
