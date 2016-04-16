@@ -57,6 +57,7 @@ public class SensorDataService extends Service implements SensorEventListener {
         Log.d("UNLOCK", "40");
         //Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LIGHT, true);
         //Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_LIGHT, 200000);
+        //needs notifications here
         Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_APPLICATIONS, true);
         Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_COMMUNICATION_EVENTS, true);
         Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SCREEN, true);
