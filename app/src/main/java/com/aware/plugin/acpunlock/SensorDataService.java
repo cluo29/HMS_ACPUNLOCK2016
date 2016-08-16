@@ -105,6 +105,9 @@ public class SensorDataService extends Service implements SensorEventListener {
 
         //Location data
         IntentFilter location_filter = new IntentFilter();
+        //big bug!
+        //
+        //!!!
         wifi_filter.addAction(Locations.ACTION_AWARE_LOCATIONS);
 
         registerReceiver(screenListener, screen_filter);
