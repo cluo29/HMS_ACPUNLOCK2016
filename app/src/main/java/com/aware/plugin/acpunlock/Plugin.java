@@ -49,7 +49,7 @@ public class Plugin extends Aware_Plugin {
         //listen to screen event
         IntentFilter screen_filter = new IntentFilter();
         screen_filter.addAction(Intent.ACTION_USER_PRESENT);
-        registerReceiver(screenListener, screen_filter);
+        //registerReceiver(screenListener, screen_filter);
 
         //listen to ESM answer
         IntentFilter answer_filter = new IntentFilter("ESM_answer_submitted");
@@ -105,13 +105,17 @@ public class Plugin extends Aware_Plugin {
 //        Aware.startPlugin(this, "com.aware.plugin.acpunlock");
         //start the activity recognition service
         //ESM when boot or installation
-        startBootESM();
+        //startBootESM();
+
+        /*
 
         if (Aware.getSetting(this, "study_id").length() == 0) {
             Intent joinStudy = new Intent(this, Aware_Preferences.StudyConfig.class);
             joinStudy.putExtra(Aware_Preferences.StudyConfig.EXTRA_JOIN_STUDY, "https://api.awareframework.com/index.php/webservice/index/634/0FOT21HRz8IZ");
             startService(joinStudy);
         }
+
+        */
     }
 
     //screen handle
